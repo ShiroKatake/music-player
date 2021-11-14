@@ -29,7 +29,42 @@ const MusicPlayer = () => {
           <Text style={styles.title}>Track Title</Text>
           <Text style={styles.artistName}>Artist Name</Text>
         </View>
+        <View>
+          <Slider
+            style={styles.progressBar}
+            value={10}
+            minimumValue={0}
+            maximumValue={100}
+            onSlidingComplete={() => {}}
+          />
+        </View>
+        <View style={styles.progressLabelContainer}>
+          <Text style={styles.progressLabelText}>0:00</Text>
+          <Text style={styles.progressLabelText}>0:00</Text>
+        </View>
+        <View style={styles.trackControls}>
+          <TouchableOpacity onPress={() => {}}>
+            <Ionicons
+              name="play-skip-back-outline"
+              size={35}
+              color="#FFF"
+              style={{ marginTop: 20 }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {}}>
+            <Ionicons name="play-circle" size={70} color="#FFF" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {}}>
+            <Ionicons
+              name="play-skip-forward-outline"
+              size={35}
+              color="#FFF"
+              style={{ marginTop: 20 }}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
+
       <View style={styles.navContainer}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={() => {}}>
@@ -94,6 +129,26 @@ const styles = StyleSheet.create({
     fontWeight: "100",
     textAlign: "center",
     color: "#eee",
+  },
+  progressBar: {
+    width: 350,
+    height: 40,
+    marginTop: 25,
+    flexDirection: "row",
+  },
+  progressLabelContainer: {
+    width: 300,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  progressLabelText: {
+    color: "#fff",
+  },
+  trackControls: {
+    flexDirection: "row",
+    width: "60%",
+    justifyContent: "space-between",
+    marginTop: 15,
   },
   navContainer: {
     borderTopColor: "#393E46",
