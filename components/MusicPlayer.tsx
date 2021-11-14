@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -8,28 +8,86 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  Animated,
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Slider from "@react-native-community/slider";
+import songs from "../assets/data";
 
 const { width, height } = Dimensions.get("window");
 
 const MusicPlayer = () => {
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const [songIndex, setSongIndex] = useState(0);
+
+  const songSlider = useRef(null);
+
+  useEffect(() => {
+    scrollX.addListener(({ value }) => {
+      const index = Math.round(value / width);
+      setSongIndex(index);
+    });
+    return () => {
+      scrollX.removeAllListeners();
+    };
+  }, []);
+
+  const skipToNext = () => {
+    songSlider.current?.scrollToOffset({
+      offset: (songIndex + 1) * width,
+    });
+  };
+
+  const skipToPrevious = () => {
+    songSlider.current?.scrollToOffset({
+      offset: (songIndex - 1) * width,
+    });
+  };
+
+  const renderSongs = ({ index, item }) => {
+    return (
+      <Animated.View
+        style={{
+          width: width,
+          justifyContent: "center",
+          alignItems: "center",
+        }}>
+        <View style={styles.artworkWrapper}>
+          <Image style={styles.artworkImage} source={item.image} />
+        </View>
+      </Animated.View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.mainContainer}>
-        <View style={styles.artworkWrapper}>
-          <Image
-            style={styles.artworkImage}
-            source={{
-              uri: "https://upload.wikimedia.org/wikipedia/en/4/45/Divide_cover.png",
-            }}
+        <View style={{ width: width }}>
+          <Animated.FlatList
+            ref={songSlider}
+            data={songs}
+            renderItem={renderSongs}
+            keyExtractor={(item) => item.id}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+              [
+                {
+                  nativeEvent: {
+                    contentOffset: { x: scrollX },
+                  },
+                },
+              ],
+              { useNativeDriver: true },
+            )}
           />
         </View>
 
         <View>
-          <Text style={styles.title}>Song Title</Text>
-          <Text style={styles.artistName}>Artist Name</Text>
+          <Text style={styles.title}>{songs[songIndex].title}</Text>
+          <Text style={styles.artistName}>{songs[songIndex].artist}</Text>
         </View>
 
         <View>
@@ -48,7 +106,7 @@ const MusicPlayer = () => {
         </View>
 
         <View style={styles.songControls}>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={skipToPrevious}>
             <Ionicons
               name="play-skip-back-outline"
               size={35}
@@ -59,7 +117,7 @@ const MusicPlayer = () => {
           <TouchableOpacity onPress={() => {}}>
             <Ionicons name="play-circle" size={70} color="#FFF" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={skipToNext}>
             <Ionicons
               name="play-skip-forward-outline"
               size={35}
