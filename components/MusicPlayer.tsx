@@ -20,7 +20,7 @@ const MusicPlayer = () => {
   const scrollX = useRef(new Animated.Value(0)).current;
   const [songIndex, setSongIndex] = useState(0);
 
-  const songSlider = useRef(null);
+  const songSlider = useRef<any>(null);
 
   useEffect(() => {
     scrollX.addListener(({ value }) => {
@@ -33,13 +33,13 @@ const MusicPlayer = () => {
   }, []);
 
   const skipToNext = () => {
-    songSlider.current?.scrollToOffset({
+    songSlider.current.scrollToOffset({
       offset: (songIndex + 1) * width,
     });
   };
 
   const skipToPrevious = () => {
-    songSlider.current?.scrollToOffset({
+    songSlider.current.scrollToOffset({
       offset: (songIndex - 1) * width,
     });
   };
