@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=reactnative
 
 ### ReactNative ###
+assets/
 # React Native Stack Base
 
 .expo
