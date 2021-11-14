@@ -25,10 +25,12 @@ const MusicPlayer = () => {
             }}
           />
         </View>
+
         <View>
-          <Text style={styles.title}>Track Title</Text>
+          <Text style={styles.title}>Song Title</Text>
           <Text style={styles.artistName}>Artist Name</Text>
         </View>
+
         <View>
           <Slider
             style={styles.progressBar}
@@ -38,11 +40,13 @@ const MusicPlayer = () => {
             onSlidingComplete={() => {}}
           />
         </View>
+
         <View style={styles.progressLabelContainer}>
           <Text style={styles.progressLabelText}>0:00</Text>
           <Text style={styles.progressLabelText}>0:00</Text>
         </View>
-        <View style={styles.trackControls}>
+
+        <View style={styles.songControls}>
           <TouchableOpacity onPress={() => {}}>
             <Ionicons
               name="play-skip-back-outline"
@@ -144,7 +148,7 @@ const styles = StyleSheet.create({
   progressLabelText: {
     color: "#fff",
   },
-  trackControls: {
+  songControls: {
     flexDirection: "row",
     width: "60%",
     justifyContent: "space-between",
