@@ -10,19 +10,48 @@ import {
   FlatList,
   Animated,
 } from "react-native";
+
+import TrackPlayer, {
+  Capability,
+  Event,
+  RepeatMode,
+  State,
+  usePlaybackState,
+  useProgress,
+  useTrackPlayerEvents,
+} from "react-native-track-player";
+
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Slider from "@react-native-community/slider";
 import songs from "../assets/data";
 
 const { width, height } = Dimensions.get("window");
 
+const setupPlayer = async () => {
+  await TrackPlayer.setupPlayer();
+  await TrackPlayer.add(songs);
+};
+
+const togglePlayPause = async (playbackState: State) => {
+  const currentTrack = await TrackPlayer.getCurrentTrack();
+  if (currentTrack != null) {
+    if (playbackState == State.Paused) {
+      await TrackPlayer.play();
+    } else {
+      await TrackPlayer.pause();
+    }
+  }
+};
+
 const MusicPlayer = () => {
+  const playbackState = usePlaybackState();
   const scrollX = useRef(new Animated.Value(0)).current;
   const [songIndex, setSongIndex] = useState(0);
 
   const songSlider = useRef<any>(null);
 
   useEffect(() => {
+    setupPlayer();
     scrollX.addListener(({ value }) => {
       const index = Math.round(value / width);
       setSongIndex(index);
@@ -114,8 +143,14 @@ const MusicPlayer = () => {
               style={{ marginTop: 20 }}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}}>
-            <Ionicons name="play-circle" size={70} color="#FFF" />
+          <TouchableOpacity onPress={() => togglePlayPause(playbackState)}>
+            <Ionicons
+              name={
+                playbackState == State.Playing ? "pause-circle" : "play-circle"
+              }
+              size={70}
+              color="#FFF"
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={skipToNext}>
             <Ionicons
