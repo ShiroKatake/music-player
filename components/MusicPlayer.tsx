@@ -22,6 +22,7 @@ import TrackPlayer, {
 } from "react-native-track-player";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Slider from "@react-native-community/slider";
 import songs from "../assets/data";
 
@@ -46,15 +47,68 @@ const togglePlayPause = async (playbackState: State) => {
 const MusicPlayer = () => {
   const playbackState = usePlaybackState();
   const progress = useProgress();
+  const [trackTitle, setTrackTitle] = useState<string>();
+  const [trackArtwork, setTrackArtwork] = useState<any>();
+  const [trackArtist, setTrackArtist] = useState<string>();
   const scrollX = useRef(new Animated.Value(0)).current;
   const [songIndex, setSongIndex] = useState(0);
+  const [repeatMode, setRepeatMode] = useState("off");
 
   const songSlider = useRef<any>(null);
+
+  useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
+    if (event.type == Event.PlaybackTrackChanged && event.nextTrack != null) {
+      const track = await TrackPlayer.getTrack(event.nextTrack);
+      const { title, artwork, artist } = track;
+      setTrackTitle(title);
+      setTrackArtwork(artwork);
+      setTrackArtist(artist);
+    }
+  });
+
+  const repeatIcon = () => {
+    switch (repeatMode) {
+      case "off":
+        return "repeat-off";
+      case "track":
+        return "repeat-once";
+      case "repeat":
+        return "repeat";
+
+      default:
+        break;
+    }
+  };
+
+  const changeRepeatMode = () => {
+    switch (repeatMode) {
+      case "off":
+        TrackPlayer.setRepeatMode(RepeatMode.Track);
+        setRepeatMode("track");
+        break;
+      case "track":
+        TrackPlayer.setRepeatMode(RepeatMode.Track);
+        setRepeatMode("repeat");
+        break;
+      case "repeat":
+        TrackPlayer.setRepeatMode(RepeatMode.Track);
+        setRepeatMode("off");
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const skipTo = async (songId: number) => {
+    await TrackPlayer.skip(songId);
+  };
 
   useEffect(() => {
     setupPlayer();
     scrollX.addListener(({ value }) => {
       const index = Math.round(value / width);
+      skipTo(index);
       setSongIndex(index);
     });
     return () => {
@@ -83,7 +137,7 @@ const MusicPlayer = () => {
           alignItems: "center",
         }}>
         <View style={styles.artworkWrapper}>
-          <Image style={styles.artworkImage} source={item.image} />
+          <Image style={styles.artworkImage} source={trackArtwork} />
         </View>
       </Animated.View>
     );
@@ -116,8 +170,8 @@ const MusicPlayer = () => {
         </View>
 
         <View>
-          <Text style={styles.title}>{songs[songIndex].title}</Text>
-          <Text style={styles.artistName}>{songs[songIndex].artist}</Text>
+          <Text style={styles.title}>{trackTitle}</Text>
+          <Text style={styles.artistName}>{trackArtist}</Text>
         </View>
 
         <View>
@@ -175,8 +229,12 @@ const MusicPlayer = () => {
           <TouchableOpacity onPress={() => {}}>
             <Ionicons name="heart-outline" size={30} color="#777" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => {}}>
-            <Ionicons name="repeat" size={30} color="#777" />
+          <TouchableOpacity onPress={changeRepeatMode}>
+            <MaterialCommunityIcons
+              name={`${repeatIcon()}`}
+              size={30}
+              color="#777"
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => {}}>
             <Ionicons name="share-outline" size={30} color="#777" />
