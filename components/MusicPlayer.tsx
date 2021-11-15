@@ -45,6 +45,7 @@ const togglePlayPause = async (playbackState: State) => {
 
 const MusicPlayer = () => {
   const playbackState = usePlaybackState();
+  const progress = useProgress();
   const scrollX = useRef(new Animated.Value(0)).current;
   const [songIndex, setSongIndex] = useState(0);
 
@@ -122,22 +123,28 @@ const MusicPlayer = () => {
         <View>
           <Slider
             style={styles.progressBar}
-            value={10}
+            value={progress.position}
             minimumValue={0}
-            maximumValue={100}
-            onSlidingComplete={() => {}}
+            maximumValue={progress.duration}
+            onSlidingComplete={async (value) => {
+              await TrackPlayer.seekTo(value);
+            }}
           />
         </View>
 
         <View style={styles.progressLabelContainer}>
-          <Text style={styles.progressLabelText}>0:00</Text>
-          <Text style={styles.progressLabelText}>0:00</Text>
+          <Text style={styles.progressLabelText}>
+            {new Date(progress.position * 1000).toISOString().substr(14, 5)}
+          </Text>
+          <Text style={styles.progressLabelText}>
+            {new Date(progress.duration * 1000).toISOString().substr(14, 5)}
+          </Text>
         </View>
 
         <View style={styles.songControls}>
           <TouchableOpacity onPress={skipToPrevious}>
             <Ionicons
-              name="play-skip-back-outline"
+              name="play-skip-back"
               size={35}
               color="#FFF"
               style={{ marginTop: 20 }}
@@ -154,7 +161,7 @@ const MusicPlayer = () => {
           </TouchableOpacity>
           <TouchableOpacity onPress={skipToNext}>
             <Ionicons
-              name="play-skip-forward-outline"
+              name="play-skip-forward"
               size={35}
               color="#FFF"
               style={{ marginTop: 20 }}
