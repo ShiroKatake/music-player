@@ -4,13 +4,11 @@ import {
   StyleSheet,
   SafeAreaView,
   Dimensions,
-  Animated,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
 
-import TrackPlayer, {
-  Event,
-  useTrackPlayerEvents,
-} from "react-native-track-player";
+import TrackPlayer, { Event, useTrackPlayerEvents } from "react-native-track-player";
 
 import tracks from "../assets/data";
 import { TrackSecondaryControl } from "./TrackSecondaryControl";
@@ -23,45 +21,42 @@ const { width, height } = Dimensions.get("window");
 const setupPlayer = async () => {
   await TrackPlayer.setupPlayer();
   await TrackPlayer.add(tracks);
+  await TrackPlayer.skip(0);
 };
 
 const MusicPlayer = () => {
-  const trackSlider = useRef<any>(null);
-
   const [trackTitle, setTrackTitle] = useState<string>();
-  const [trackArtwork, setTrackArtwork] = useState<any>();
   const [trackArtist, setTrackArtist] = useState<string>();
 
-  const scrollX = useRef(new Animated.Value(0)).current;
+  const trackSlider = useRef<any>(null);
   const [trackIndex, setTrackIndex] = useState(0);
-
-  useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
-    if (event.type == Event.PlaybackTrackChanged && event.nextTrack != null) {
-      const track = await TrackPlayer.getTrack(event.nextTrack);
-      const { title, artwork, artist } = track;
-      setTrackTitle(title);
-      setTrackArtwork(artwork);
-      setTrackArtist(artist);
-    }
-  });
-
-  const skipTo = async (trackId: number) => {
-    await TrackPlayer.skip(trackId);
-  };
 
   useEffect(() => {
     setupPlayer();
-
-    scrollX.addListener(({ value }) => {
-      const index = Math.round(value / width);
-      skipTo(index);
-      setTrackIndex(index);
-    });
-
-    return () => {
-      scrollX.removeAllListeners();
-    };
   }, []);
+
+  useEffect(() => {
+    trackSlider.current.scrollToIndex({ index: trackIndex });
+  }, [trackIndex]);
+
+  const onScrollEnd = async (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const index = Math.round(event.nativeEvent.contentOffset.x / width);
+    setTrackIndex(index);
+    // Only skip song if the swipe actually switches to a new song
+    if (index != trackIndex) {
+      await TrackPlayer.skip(index);
+    }
+  };
+
+  useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
+    if (event.type === Event.PlaybackTrackChanged && event.nextTrack != null) {
+      const track = await TrackPlayer.getTrack(event.nextTrack);
+      const { title, artist } = track;
+      setTrackTitle(title);
+      setTrackArtist(artist);
+      setTrackIndex(event.nextTrack);
+    }
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,18 +64,13 @@ const MusicPlayer = () => {
         <TrackInfo
           width={width}
           tracks={tracks}
-          trackArtwork={trackArtwork}
           trackTitle={trackTitle}
           trackArtist={trackArtist}
           trackSlider={trackSlider}
-          scrollX={scrollX}
+          onScrollEnd={onScrollEnd}
         />
         <ProgressBar />
-        <TrackPrimaryControl
-          width={width}
-          trackIndex={trackIndex}
-          trackSlider={trackSlider}
-        />
+        <TrackPrimaryControl currentTrackIndex={trackIndex} trackSlider={trackSlider} />
       </View>
       <TrackSecondaryControl width={width} />
     </SafeAreaView>

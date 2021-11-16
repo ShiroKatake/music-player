@@ -1,25 +1,33 @@
-import React from "react";
-import { View, StyleSheet, Text, Animated, Image } from "react-native";
+import React, { RefObject } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Animated,
+  Image,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from "react-native";
 
 interface ITrackInfoProp {
   width: number;
   tracks: any;
-  trackArtwork: any;
   trackTitle: string | undefined;
   trackArtist: string | undefined;
-  trackSlider: React.MutableRefObject<any>;
-  scrollX: Animated.Value;
+  trackSlider: RefObject<Animated.FlatList>;
+  onScrollEnd: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
 }
 
 export const TrackInfo = ({
   width,
   tracks,
-  trackArtwork,
   trackTitle,
   trackArtist,
   trackSlider,
-  scrollX,
+  onScrollEnd,
 }: ITrackInfoProp) => {
+  const scrollX = new Animated.Value(0);
+
   const renderTracks = ({ item }) => {
     return (
       <Animated.View
@@ -47,6 +55,7 @@ export const TrackInfo = ({
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           scrollEventThrottle={16}
+          onMomentumScrollEnd={onScrollEnd}
           // prettier-ignore
           onScroll={Animated.event([{
             nativeEvent: {
@@ -57,7 +66,7 @@ export const TrackInfo = ({
       </View>
 
       <View>
-        <Text style={styles.title}>{trackTitle}</Text>
+        <Text style={styles.trackTitle}>{trackTitle}</Text>
         <Text style={styles.artistName}>{trackArtist}</Text>
       </View>
     </>
@@ -87,7 +96,7 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 15,
   },
-  title: {
+  trackTitle: {
     fontSize: 18,
     fontWeight: "700",
     textAlign: "center",

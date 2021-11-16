@@ -1,24 +1,25 @@
 import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import TrackPlayer, {
-  State,
-  usePlaybackState,
-} from "react-native-track-player";
+import TrackPlayer, { State, usePlaybackState } from "react-native-track-player";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 interface ITrackPrimaryControlProps {
   trackSlider: React.MutableRefObject<any>;
-  trackIndex: number;
-  width: number;
+  currentTrackIndex: number;
 }
 
 export const TrackPrimaryControl = ({
   trackSlider,
-  trackIndex,
-  width,
+  currentTrackIndex,
 }: ITrackPrimaryControlProps) => {
   const playbackState = usePlaybackState();
+
+  const skipToPrevious = () => {
+    trackSlider.current.scrollToIndex({ index: currentTrackIndex - 1 });
+    TrackPlayer.skipToPrevious();
+  };
+
   const togglePlayPause = async (playbackState: State) => {
     const currentTrack = await TrackPlayer.getCurrentTrack();
     if (currentTrack != null) {
@@ -31,15 +32,8 @@ export const TrackPrimaryControl = ({
   };
 
   const skipToNext = () => {
-    trackSlider.current.scrollToOffset({
-      offset: (trackIndex + 1) * width,
-    });
-  };
-
-  const skipToPrevious = () => {
-    trackSlider.current.scrollToOffset({
-      offset: (trackIndex - 1) * width,
-    });
+    trackSlider.current.scrollToIndex({ index: currentTrackIndex + 1 });
+    TrackPlayer.skipToNext();
   };
 
   return (
