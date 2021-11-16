@@ -5,7 +5,7 @@ import MusicPlayer from "./components/MusicPlayer";
 const App = () => {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor="#222" />
       <MusicPlayer />
     </View>
   );
