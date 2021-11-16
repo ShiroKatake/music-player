@@ -70,7 +70,10 @@ const MusicPlayer = () => {
           onScrollEnd={onScrollEnd}
         />
         <ProgressBar />
-        <TrackPrimaryControl currentTrackIndex={trackIndex} trackSlider={trackSlider} />
+        <TrackPrimaryControl
+          currentTrackIndex={trackIndex}
+          trackSlider={trackSlider}
+        />
       </View>
       <TrackSecondaryControl width={width} />
     </SafeAreaView>

@@ -9,9 +9,7 @@ interface ITrackSecondaryControlProp {
   width: number;
 }
 
-export const TrackSecondaryControl = ({
-  width,
-}: ITrackSecondaryControlProp) => {
+export const TrackSecondaryControl = ({ width }: ITrackSecondaryControlProp) => {
   const [repeatMode, setRepeatMode] = useState("off");
 
   const repeatIcon = () => {
@@ -55,11 +53,7 @@ export const TrackSecondaryControl = ({
           <Ionicons name="heart-outline" size={30} color="#777" />
         </TouchableOpacity>
         <TouchableOpacity onPress={changeRepeatMode}>
-          <MaterialCommunityIcons
-            name={`${repeatIcon()}`}
-            size={30}
-            color="#777"
-          />
+          <MaterialCommunityIcons name={`${repeatIcon()}`} size={30} color="#777" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => {}}>
           <Ionicons name="share-outline" size={30} color="#777" />
